@@ -1,6 +1,8 @@
 {
     /* 开源地址: https://github.com/chen310/NeteaseCloudMusicTasks */
-    "version": "2.19",
+    "version": "2.20",
+    "sha": "commitId",
+    /* 多账号的配置详见 https://github.com/chen310/NeteaseCloudMusicTasks#%E5%A4%9A%E8%B4%A6%E5%8F%B7 */
     "users": [
         {
             /* 填写手机号或邮箱 */
@@ -9,21 +11,16 @@
             "countrycode": "",
             /* 填写密码或 32 位 md5 加密后的密码 */
             "password": "",
+            /* 若都填写了账号密码和 cookie，会优先使用 cookie */
+            /* cookie 失效后才会使用账号密码登录 */
+            /* 填写方式详见 https://github.com/chen310/NeteaseCloudMusicTasks#%E8%B4%A6%E5%8F%B7%E5%AF%86%E7%A0%81 */
+            "cookie": "",
             /* 填写国内IP，否则可能会有无法登录等问题出现，多个账号最好设置不同的IP */
             /* 可填写本机IP，查看方法：https://www.ip138.com/ 填写显示的ip即可 */
             "X-Real-IP": "",
             /* 是否运行该账号的任务 */
             "enable": true
-            /* 若每个账号的任务设置不同,请在下方单独设置 */
-            /* ,"setting":{} */
-        } /*,{
-            "username":"",
-            "countrycode": "",
-            "password":"",
-            "X-Real-IP":"",
-            "enable": true
-        }*/
-        /* 多个账号删除上面的注释，以此类推 */
+        } 
     ],
     "setting": {
         /* 推送 */
@@ -101,6 +98,18 @@
                 /* Bark的API key */
                 "Bark_key": "",
                 /* 是否将多个账号的信息合并推送, 建议为false，iOS推送消息过长可能会失败 */
+                "merge": false
+            },
+            /* https://github.com/easychen/pushdeer */
+            "pushdeer": {
+                "module": "pushdeer",
+                /* 是否启用推送 */
+                "enable": false,
+                /* 服务器地址，放空则使用官方服务器: https://api2.pushdeer.com */
+                "server": "",
+                /* pushkey */
+                "pushkey": "",
+                /* 是否将多个账号的信息合并推送 */
                 "merge": false
             }
         },
@@ -250,7 +259,9 @@
             "740005": {
                 "taskName": "访问自己的云圈",
                 "module": "visitMyCircle",
-                "enable": false
+                "enable": false,
+                /* 自己的云圈ID，可不填写，如果提示 resourceID 获取失败，则需要手动填写 */
+                "circleId": ""
             },
             /* 发布Mlog：根据填写的歌曲ID，自动下载歌曲的专辑图，并上传 */
             "744005": {

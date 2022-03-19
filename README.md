@@ -14,7 +14,7 @@
 5. 音乐人自动签到领取云豆
 6. 音乐人自动完成任务，并领取云豆
 7. 自动领取 vip 成长值
-8. 多种推送方式
+8. 多种[推送方式](#推送)
 9. 支持多账号
 10. 支持[腾讯云函数](#一部署到腾讯云函数) & [青龙面板](#二部署到青龙面板) & [本地运行](#三本地运行) & [docker 部署](#四使用docker部署)
 
@@ -141,6 +141,8 @@ REGION 默认为 `ap-guangzhou` ，可选的地域详见[地域列表](https://c
 
 ![Function](https://cdn.jsdelivr.net/gh/chen310/NeteaseCloudMusicTasks/public/img/function.png)
 
+如果在函数服务里找不到刚刚部署的函数，先到 GitHub Actions 中确认是否部署成功。如果部署成功，则确认页面左上角的地域选择是否正确，默认地域应为广州。如果在 Secrets 中设置了 REGION，则根据自己设置的 REGION 选择相应的地域。
+
 在编辑器里点击 `config.json` 这个文件进行配置
 
 ![Config](https://cdn.jsdelivr.net/gh/chen310/NeteaseCloudMusicTasks/public/img/config.png)
@@ -159,6 +161,7 @@ REGION 默认为 `ap-guangzhou` ，可选的地域详见[地域列表](https://c
         "username": "188xxxx8888",
         "countrycode": "",
         "password": "mypassword",
+        "cookie": "MUSIC_U=xxxxxxxxx;",
         "X-Real-IP": "",
         "enable": true
     }
@@ -167,6 +170,12 @@ REGION 默认为 `ap-guangzhou` ，可选的地域详见[地域列表](https://c
 ```
 
 `username` 里填写手机号或邮箱，`password` 里填写账号密码或 32 位 md5 加密后的密码，`countrycode` 为手机号前缀，使用非中国大陆的手机号登录需填写。`X-Real-IP` 里填写国内 IP，否则可能会有无法登录等情况出现，可填写本机 IP，[点击](https://www.ip138.com/)可查看本机 IP，填写显示的 ip 即可。`enable` 为该账号的开关，设置为 `false` 表示不运行该账号的任务。
+
+如果同时填写了账号密码和 `cookie`， 会优先使用 cookie 登录，如果 cookie 填写有误或失效，会尝试使用账号密码登录。
+
+cookie 获取方式：首先在网页登录[网易云音乐](https://music.163.com/)，然后按 `F12` 打开开发人员工具，再按 `F5` 刷新页面，最后按照以下步骤来获取 cookie，可以只复制 `MUSIC_U` 的那部分
+
+![Cookie](https://cdn.jsdelivr.net/gh/chen310/NeteaseCloudMusicTasks/public/img/cookie.png)
 
 #### 签到
 
@@ -387,6 +396,7 @@ REGION 默认为 `ap-guangzhou` ，可选的地域详见[地域列表](https://c
 4. [pushPlus](https://www.pushplus.plus)
 5. Telegram
 6. [Bark](https://github.com/Finb/Bark)
+7. [pushdeer](https://github.com/easychen/pushdeer)
 
 要使用推送的话将相应的 `enable` 设为 `true`，并填写配置
 
@@ -493,6 +503,24 @@ REGION 默认为 `ap-guangzhou` ，可选的地域详见[地域列表](https://c
 
 要使用 Bark 的话需要填写 `Bark_url` 和 `Bark_key`。可以使用 Bark 官方 API 或者自行搭建。
 
+##### pushdeer
+
+```json5
+"pushdeer": {
+    "module": "pushdeer",
+    /* 是否启用推送 */
+    "enable": false,
+    /* 服务器地址，放空则使用官方服务器: https://api2.pushdeer.com */
+    "server": "",
+    /* pushkey */
+    "pushkey": "",
+    /* 是否将多个账号的信息合并推送 */
+    "merge": false
+}
+```
+
+要使用 pushdeer 的话需要填写 `pushkey`。如果使用自己搭建的服务器，请填写 `server`。
+
 #### 刷单曲播放量
 
 ```json5
@@ -522,21 +550,21 @@ REGION 默认为 `ap-guangzhou` ，可选的地域详见[地域列表](https://c
         "username": "188xxxx8888",
         "countrycode": "",
         "password": "mypassword",
-        "X-Real-IP": "",
+        "cookie": "",
         "enable": true
     },
     {
         "username": "166xxxx6666",
         "countrycode": "",
         "password": "anotherpassword",
+        "cookie": "MUSIC_U=xxxxxxxxx;",
         "X-Real-IP": "",
         "enable": true,
     }
 ],
 // ...
 ```
-
-多账号需要删除第二个账号前后的`\*`和`*\`注释，如上所示。如果不会使用，可以每个账号创建一个相应的云函数。
+在 `users` 内填写多个账号，不同账号之间要用逗号 `,` 隔开。
 
 假如多个账号配置不同可以参照下面
 
@@ -546,6 +574,7 @@ REGION 默认为 `ap-guangzhou` ，可选的地域详见[地域列表](https://c
         "username": "188xxxx8888",
         "countrycode": "",
         "password": "mypassword",
+        "cookie": "",
         "X-Real-IP": "",
         "enable": true
     },
@@ -553,6 +582,7 @@ REGION 默认为 `ap-guangzhou` ，可选的地域详见[地域列表](https://c
         "username": "166xxxx6666",
         "countrycode": "",
         "password": "anotherpassword",
+        "cookie": "MUSIC_U=xxxxxxxxx;",
         "X-Real-IP": "",
         "enable": true,
         "setting": {
@@ -606,19 +636,52 @@ REGION 默认为 `ap-guangzhou` ，可选的地域详见[地域列表](https://c
 
 ## 二、部署到青龙面板
 
-### 拉取仓库
+### 进入容器
 
 ```shell
-ql repo https://github.com/chen310/NeteaseCloudMusicTasks.git "index.py" "" "py" && task chen310_NeteaseCloudMusicTasks/ql_update.py
+docker exec -it qinglong bash
 ```
 
-第一次使用需要安装依赖，时间可能会长一些
+如果容器名称不是 `qinglong` 则需要修改。
 
-更新代码同样也是用上面的命令
+### 拉取代码
+
+```shell
+ql repo https://github.com/chen310/NeteaseCloudMusicTasks.git "index.py" "" "py"
+```
+
+### 生成配置文件
+
+```shell
+task chen310_NeteaseCloudMusicTasks/ql_update.py
+```
+
+### 安装依赖
+
+```shell
+apk add python3-dev gcc libc-dev
+pip3 install requests json5 pycryptodomex
+```
 
 ### 修改配置文件
 
 对配置文件 `config.json` 进行修改
+
+### 更新代码
+
+如果需要更新代码则同样先进入容器
+
+```shell
+docker exec -it qinglong bash
+```
+
+然后再更新
+
+```shell
+ql repo https://github.com/chen310/NeteaseCloudMusicTasks.git "index.py" "" "py"
+task chen310_NeteaseCloudMusicTasks/ql_update.py
+
+```
 
 ## 三、本地运行
 
